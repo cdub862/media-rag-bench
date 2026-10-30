@@ -1,0 +1,22 @@
+# Python environments and generated files
+.venv/
+.uv-cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+dist/
+build/
+
+# Credentials and machine-specific configuration
+.env
+.env.*
+!.env.example
+
+# Local datasets, indexes, and benchmark outputs
+/data/
+/artifacts/
+
+# Frontend dependencies and generated output
+node_modules/
+/frontend/dist/

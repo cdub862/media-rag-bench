@@ -1,0 +1,36 @@
+[
+  {
+    "schema_version": 1,
+    "case_id": "fixture-movies-001",
+    "domain": "movies",
+    "prompt": "Recommend one science fiction film released from 2000 through 2010, inclusive, about exploring an unfamiliar place.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2010,
+      "genres_all": ["Science Fiction"]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "fixture-movies-002",
+    "domain": "movies",
+    "prompt": "Recommend one comedy released before 2000 about an unlikely friendship.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_max": 1999,
+      "genres_all": ["Comedy"]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "fixture-movies-003",
+    "domain": "movies",
+    "prompt": "Recommend two films about exploration or friendship, with a brief reason for each.",
+    "recommendation_count": 2,
+    "constraints": {},
+    "human_review": true
+  }
+]

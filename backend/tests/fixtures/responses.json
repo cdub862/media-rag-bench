@@ -1,0 +1,24 @@
+{
+  "direct": {
+    "domain": "movies",
+    "recommendations": [
+      {
+        "title": "The Quiet Observatory",
+        "release_year": 2005,
+        "explanation": "A science fiction story about exploring an unfamiliar observatory."
+      }
+    ]
+  },
+  "rag": {
+    "domain": "movies",
+    "recommendations": [
+      {
+        "title": "The Quiet Observatory",
+        "release_year": 2005,
+        "catalog_id": "fixture:movie:1",
+        "explanation": "The catalog describes exploration on a distant moon.",
+        "evidence_ids": ["fixture:movie:1"]
+      }
+    ]
+  }
+}
