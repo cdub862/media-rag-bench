@@ -18,6 +18,13 @@
 5. Report the commit and propose the next phase's concrete scope, asking the user to confirm it. Wait for that confirmation before starting the next phase.
 6. Repeat this workflow for each phase. Keep approval of completed work separate from confirmation to begin new work.
 
+## Commit message conventions
+
+- Use Conventional Commits in the form `type(scope): description`; include a meaningful scope.
+- Choose the type that describes the change: `feat`, `fix`, `docs`, `refactor`, `test`, or `chore`.
+- Use a concise, imperative description of the actual change, for example `feat(catalog): add TMDB ingestion` or `fix(evaluation): handle ambiguous titles`.
+- Do not include phase names or phase numbers in commit subjects or bodies. Describe the resulting behavior or change instead.
+
 ## Implementation scope
 
 - Implement only what the user asks for within the approved scope, plus the minimum supporting changes necessary to make it work.
