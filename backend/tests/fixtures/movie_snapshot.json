@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "dataset_version": "synthetic-v1",
+  "source": "synthetic-fixture",
+  "domain": "movies",
+  "created_at": "2026-10-30T00:00:00Z",
+  "record_count": 2,
+  "records_sha256": "e949be9405387437368b8aba43897947936b2b8f983b2486e30f98c359be5d12",
+  "selection": {
+    "kind": "synthetic-fixture",
+    "description": "Fictional records for offline smoke checks only."
+  },
+  "records": [
+    {
+      "catalog_id": "fixture:movie:1",
+      "domain": "movies",
+      "title": "The Quiet Observatory",
+      "description": "A mapmaker and an astronomer explore an abandoned observatory on a distant moon.",
+      "release_date": "2005-04-12",
+      "genres": [
+        "Science Fiction"
+      ],
+      "keywords": [
+        "exploration"
+      ],
+      "provenance": {
+        "source": "synthetic-fixture",
+        "source_id": "1",
+        "source_url": "https://example.org/fixtures/movies/1",
+        "retrieved_at": "2026-10-30T00:00:00Z",
+        "dataset_version": "synthetic-v1"
+      }
+    },
+    {
+      "catalog_id": "fixture:movie:2",
+      "domain": "movies",
+      "title": "The Borrowed Bicycle",
+      "description": "Two neighbors become friends while trying to return a bicycle that neither owns.",
+      "release_date": "1995-08-09",
+      "genres": [
+        "Comedy"
+      ],
+      "keywords": [
+        "friendship"
+      ],
+      "provenance": {
+        "source": "synthetic-fixture",
+        "source_id": "2",
+        "source_url": "https://example.org/fixtures/movies/2",
+        "retrieved_at": "2026-10-30T00:00:00Z",
+        "dataset_version": "synthetic-v1"
+      }
+    }
+  ]
+}

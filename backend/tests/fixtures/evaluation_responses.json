@@ -1,0 +1,53 @@
+{
+  "fixture-movies-001": {
+    "domain": "movies",
+    "recommendations": [
+      {
+        "title": "The Quiet Observatory",
+        "release_year": 2005,
+        "catalog_id": "fixture:movie:1",
+        "explanation": "The catalog describes exploration on a distant moon.",
+        "evidence_ids": [
+          "fixture:movie:1"
+        ]
+      }
+    ]
+  },
+  "fixture-movies-002": {
+    "domain": "movies",
+    "recommendations": [
+      {
+        "title": "The Borrowed Bicycle",
+        "release_year": 1995,
+        "catalog_id": "fixture:movie:2",
+        "explanation": "The fixture describes an unlikely friendship between neighbors.",
+        "evidence_ids": [
+          "fixture:movie:2"
+        ]
+      }
+    ]
+  },
+  "fixture-movies-003": {
+    "domain": "movies",
+    "recommendations": [
+      {
+        "title": "The Quiet Observatory",
+        "release_year": 2005,
+        "catalog_id": "fixture:movie:1",
+        "explanation": "The catalog describes exploration on a distant moon.",
+        "evidence_ids": [
+          "fixture:movie:1"
+        ]
+      },
+      {
+        "title": "The Borrowed Bicycle",
+        "release_year": 1995,
+        "catalog_id": "fixture:movie:2",
+        "explanation": "The fixture describes an unlikely friendship between neighbors.",
+        "evidence_ids": [
+          "fixture:movie:2"
+        ]
+      }
+    ]
+  }
+}

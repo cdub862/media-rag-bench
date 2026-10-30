@@ -6,7 +6,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 import re
 
-from media_rag_bench.schemas import MovieRecord
+from pydantic import ValidationError
+
+from media_rag_bench.schemas import MovieRecord, MovieSnapshot
 
 from .tmdb import API_ROOT, discovery_parameters
 
@@ -18,6 +20,34 @@ def snapshot_path(output_dir: Path, dataset_version: str) -> Path:
             "starting with a letter or digit"
         )
     return output_dir / f"{dataset_version}.json"
+
+
+def records_checksum(records: list[dict]) -> str:
+    canonical = json.dumps(
+        records, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def load_movie_snapshot(path: Path) -> MovieSnapshot:
+    payload = json.loads(path.read_bytes())
+    try:
+        snapshot = MovieSnapshot.model_validate(payload)
+    except ValidationError:
+        raise ValueError("Invalid movie snapshot schema.") from None
+    if records_checksum(payload["records"]) != snapshot.records_sha256:
+        raise ValueError("Movie snapshot checksum mismatch.")
+    if snapshot.record_count != len(snapshot.records):
+        raise ValueError("Movie snapshot record count mismatch.")
+    if len({record.catalog_id for record in snapshot.records}) != snapshot.record_count:
+        raise ValueError("Movie snapshot contains duplicate catalog IDs.")
+    if any(
+        record.provenance.dataset_version != snapshot.dataset_version
+        or record.provenance.source != snapshot.source
+        for record in snapshot.records
+    ):
+        raise ValueError("Movie snapshot record sources do not match its metadata.")
+    return snapshot
 
 
 def save_movie_snapshot(
@@ -40,9 +70,6 @@ def save_movie_snapshot(
     ):
         raise ValueError("record sources must match the TMDB snapshot version")
     serialized_records = [record.model_dump(mode="json") for record in records]
-    canonical_records = json.dumps(
-        serialized_records, sort_keys=True, separators=(",", ":"), ensure_ascii=False
-    ).encode("utf-8")
     snapshot = {
         "schema_version": 1,
         "dataset_version": dataset_version,
@@ -50,7 +77,7 @@ def save_movie_snapshot(
         "domain": "movies",
         "created_at": datetime.now(UTC).isoformat(),
         "record_count": len(records),
-        "records_sha256": hashlib.sha256(canonical_records).hexdigest(),
+        "records_sha256": records_checksum(serialized_records),
         "selection": {
             "endpoint": f"{API_ROOT}/discover/movie",
             "parameters": discovery_parameters(language),

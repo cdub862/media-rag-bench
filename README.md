@@ -6,9 +6,10 @@ then albums and video games. The full plan is in
 
 ## Current phase
 
-Phase 1B adds TMDB movie ingestion and versioned local snapshots to the Python
-contracts and synthetic cases from Phase 1A. The evaluation runner is the next
-slice of roadmap Phase 1. No model calls or frontend are included in this slice.
+Phase 1C adds offline evaluation of saved recommendations against validated movie
+snapshots. The earlier slices provide Python contracts and TMDB ingestion. The
+evaluation set still contains three synthetic cases; expanding it to 30–50 real
+requests is a later slice. No model calls or frontend are included in this slice.
 
 ## Run from the repository root
 
@@ -40,6 +41,7 @@ uv's build backend supports this through its
 - `backend/src/media_rag_bench/schemas/`: movie records, provenance, recommendation
   responses, and movie evaluation cases.
 - `backend/src/media_rag_bench/datasets/`: TMDB ingestion and JSON snapshot storage.
+- `backend/src/media_rag_bench/evaluation/`: shared runner and movie matching/scoring.
 - `backend/tests/`: focused validation tests and synthetic fixtures.
 - `benchmarks/cases/`: versioned evaluation requests, separate from catalog data.
 - `data/` and `artifacts/`: reserved for local catalogs and generated outputs;
@@ -98,6 +100,66 @@ including an approved logo when the demo is built.
 
 This product uses the TMDB API but is not endorsed or certified by TMDB.
 
+## Evaluate saved recommendations
+
+This command runs entirely offline and does not require a TMDB or model token:
+
+```powershell
+uv run --locked media-rag-bench evaluate-movies --snapshot backend/tests/fixtures/movie_snapshot.json --cases benchmarks/cases/movies.sample.json --responses backend/tests/fixtures/evaluation_responses.json --method rag --output artifacts/evaluation-fixture-rag-v1.json
+```
+
+The included snapshot and answers are synthetic fixtures. This checks the runner,
+not model quality. To evaluate your own saved answers, use a movie snapshot from
+ingestion, an array of movie cases, and a JSON object mapping case IDs to responses:
+
+```json
+{
+  "fixture-movies-001": {
+    "domain": "movies",
+    "recommendations": [
+      {
+        "title": "The Quiet Observatory",
+        "release_year": 2005,
+        "explanation": "A story about exploration.",
+        "catalog_id": "fixture:movie:1",
+        "evidence_ids": ["fixture:movie:1"]
+      }
+    ]
+  }
+}
+```
+
+Use `--method direct` for direct responses, which can omit catalog and evidence
+IDs. A value can also be a raw JSON response string, or `{"error": "Model unavailable"}`
+to record an unsuccessful call. Missing cases and malformed responses are reported
+separately. Unknown case IDs, duplicate case IDs, and invalid input files stop the
+command. An existing output report is never overwritten.
+
+Snapshot loading validates the schema, checksum, record count, unique catalog IDs,
+and source/version consistency. Reports retain the dataset version and records
+checksum, case/response file hashes, evaluator version, and per-case results.
+
+Matching uses a supplied catalog ID and checks its title, or uses a normalized
+title and the proposed release year when available. Normalization applies Unicode
+NFKC, case folding, and whitespace collapsing; punctuation is preserved. No fuzzy
+matching is performed. Ambiguous titles, out-of-catalog identities, and conflicting
+known IDs/titles are reported separately. An out-of-catalog title is not labeled
+factually wrong. Unresolvable identities and missing catalog metadata produce
+`unknown` constraint checks rather than failures.
+
+Objective checks cover the requested count, duplicate recommendations, inclusive
+release-year bounds, all requested genres, and stated release years. RAG evidence
+IDs must exist in the catalog and include the matched movie's ID; evidence is
+`not_applicable` for direct responses. These ID checks do not establish that a
+record was retrieved or that the explanation is supported by its text.
+
+Summary counts retain `pass`, `fail`, `unknown`, and `not_applicable` separately.
+Count/uniqueness checks have one result per case; fact/evidence checks have one
+result per recommendation in structurally valid responses. Invalid, missing, and
+failed responses remain in the response totals. No composite quality score is
+calculated. Subjective relevance, explanation accuracy, and human ratings remain
+outside this automated scorer.
+
 ## Contracts and fixtures
 
 Movie records retain source identity, source URL, timezone-aware retrieval time,
@@ -107,7 +169,7 @@ as missing data rather than fabricated.
 Recommendation responses share a domain and a list of recommendations. A direct
 response can use a proposed title without a catalog ID; a RAG response can attach
 catalog and evidence IDs. Missing citations and out-of-catalog titles remain
-representable so the future evaluator can report them. Validation checks shape,
+representable so the evaluator can report them. Schema validation checks shape,
 not factual accuracy or recommendation quality.
 
 `benchmarks/cases/movies.sample.json` and the test fixtures use fictional titles

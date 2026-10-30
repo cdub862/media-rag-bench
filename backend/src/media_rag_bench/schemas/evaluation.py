@@ -1,10 +1,10 @@
-"""Movie evaluation inputs; scoring is implemented in a later phase."""
+"""Shared evaluation inputs with movie-specific constraints."""
 
 from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
-from .common import Contract, NonEmptyText
+from .common import Contract, Domain, NonEmptyText
 
 
 class MovieConstraints(Contract):
@@ -23,11 +23,15 @@ class MovieConstraints(Contract):
         return self
 
 
-class MovieEvaluationCase(Contract):
+class EvaluationCase(Contract):
     schema_version: Literal[1] = 1
     case_id: NonEmptyText
-    domain: Literal["movies"] = "movies"
+    domain: Domain
     prompt: NonEmptyText
     recommendation_count: int = Field(ge=1)
-    constraints: MovieConstraints = Field(default_factory=MovieConstraints)
     human_review: bool = False
+
+
+class MovieEvaluationCase(EvaluationCase):
+    domain: Literal["movies"] = "movies"
+    constraints: MovieConstraints = Field(default_factory=MovieConstraints)

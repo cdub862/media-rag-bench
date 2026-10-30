@@ -29,3 +29,15 @@ class MovieRecord(CatalogRecord):
     release_date: date | None = None
     genres: list[NonEmptyText] = Field(default_factory=list)
     keywords: list[NonEmptyText] = Field(default_factory=list)
+
+
+class MovieSnapshot(Contract):
+    schema_version: Literal[1]
+    dataset_version: NonEmptyText
+    source: NonEmptyText
+    domain: Literal["movies"]
+    created_at: AwareDatetime
+    record_count: int = Field(ge=1)
+    records_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    selection: dict
+    records: list[MovieRecord] = Field(min_length=1)
