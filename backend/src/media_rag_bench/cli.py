@@ -45,14 +45,24 @@ def _positive_integer(value: str) -> int:
 def _recommend_movies(args: argparse.Namespace) -> None:
     if (args.prompt is None) == (args.case_id is None):
         raise ValueError("Provide either a quoted movie request or --case CASE_ID.")
+    if args.output is not None:
+        if args.case_id is None:
+            raise ValueError("--output requires --case CASE_ID so the response can be evaluated.")
+        if args.dry_run:
+            raise ValueError("--output cannot be used with --dry-run.")
+        if args.output.exists() or args.output.is_symlink():
+            raise FileExistsError(f"Run directory already exists: {args.output}. Choose a new output path.")
+    case = None
     if args.case_id is not None:
         if args.count is not None:
             raise ValueError("--case uses the case's recommendation count; omit --count.")
-        cases = TypeAdapter(list[MovieEvaluationCase]).validate_json(args.cases.read_bytes())
+        case_bytes = args.cases.read_bytes()
+        cases = TypeAdapter(list[MovieEvaluationCase]).validate_json(case_bytes)
         matches = [case for case in cases if case.case_id == args.case_id]
         if len(matches) != 1:
             raise ValueError("Case ID must identify exactly one movie case in --cases.")
-        prompt, count = matches[0].prompt, matches[0].recommendation_count
+        case = matches[0]
+        prompt, count = case.prompt, case.recommendation_count
     else:
         prompt, count = args.prompt.strip(), args.count or 3
     if not prompt:
@@ -78,6 +88,28 @@ def _recommend_movies(args: argparse.Namespace) -> None:
         result = generate_movies(
             client, prompt=prompt, count=count, model=model, max_output_tokens=args.max_output_tokens
         )
+    if args.output is not None and case is not None:
+        responses = {case.case_id: result.response.model_dump(mode="json")}
+        metadata = {
+            "schema_version": 1,
+            "created_at": datetime.now(UTC).isoformat(),
+            "provider": "openai",
+            "method": "direct",
+            "case": case.model_dump(mode="json"),
+            "cases_file": {"path": str(args.cases), "sha256": hashlib.sha256(case_bytes).hexdigest()},
+            "instructions": movie_instructions(count),
+            "requested_model": model,
+            "model": result.model,
+            "max_output_tokens": args.max_output_tokens,
+            "latency_seconds": result.latency_seconds,
+            "input_tokens": result.input_tokens,
+            "output_tokens": result.output_tokens,
+        }
+        args.output.mkdir(parents=True, exist_ok=False)
+        for name, payload in (("responses.json", responses), ("run.json", metadata)):
+            with (args.output / name).open("x", encoding="utf-8", newline="\n") as handle:
+                handle.write(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+        print(f"Saved response and run metadata to {args.output}")
     print("\nMovie recommendations\n")
     width = max(40, min(get_terminal_size(fallback=(100, 24)).columns, 120))
     for index, movie in enumerate(result.response.recommendations, start=1):
@@ -178,6 +210,7 @@ def main(argv: list[str] | None = None) -> int:
     recommend.add_argument("--model", help="OpenAI model ID; defaults to OPENAI_MODEL")
     recommend.add_argument("--max-output-tokens", type=_positive_integer, default=4096)
     recommend.add_argument("--dry-run", action="store_true", help="Print the prompt without calling a model")
+    recommend.add_argument("--output", type=Path, help="Save a --case response and metadata in a new run directory")
     args = parser.parse_args(argv)
     try:
         load_dotenv(dotenv_path=Path.cwd() / ".env", override=False, encoding="utf-8-sig")

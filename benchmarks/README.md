@@ -100,6 +100,10 @@ It displays the instructions and request sent to OpenAI, then prints numbered
 answers with years and explanations. Set `OPENAI_API_KEY` and `OPENAI_MODEL` in
 your local `.env`, which the CLI loads automatically from the current working
 directory, for a live call. Add `--dry-run` for an offline prompt preview. The
-selected case supplies its recommendation count. This command displays one
-response; full saved benchmark runs remain future work. Game and album support
-will follow their dataset adapters.
+selected case supplies its recommendation count. Add
+`--output artifacts/movies-v1-003-run1` to save the answer as `responses.json` and
+its model, prompt, latency, and usage metadata as `run.json` in a new directory.
+Pass `responses.json` to `evaluate-movies --responses`; the remaining cases are
+reported as missing. Existing output paths are refused before a model call, and
+`--output` cannot be combined with `--dry-run`. Full benchmark runs remain future
+work. Game and album support will follow their dataset adapters.

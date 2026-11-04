@@ -8,9 +8,9 @@ then albums and video games. The full plan is in
 
 The current changes add 40 movie evaluation requests, a fixed 12-case human-review
 subset, a relevance-rating rubric, and a readable movie recommendation CLI. The
-CLI supports single direct OpenAI requests; a complete measured model benchmark
-remains future work. Earlier slices provide Python contracts, TMDB ingestion,
-and offline evaluation.
+CLI supports single direct OpenAI requests and saving individual case runs for
+offline evaluation; a complete measured model benchmark remains future work.
+Earlier slices provide Python contracts, TMDB ingestion, and offline evaluation.
 
 ## Run from the repository root
 
@@ -101,8 +101,38 @@ outputs as errors. Live calls use your OpenAI API account. No API cost estimate
 or benchmark result is inferred from this single response.
 
 Movies are supported first. Game and album commands will follow their domain
-adapters and evaluation sets. Responses here are displayed in the terminal;
-saved full benchmark runs remain a later slice.
+adapters and evaluation sets. Full benchmark runs remain a later slice.
+
+### Save one case for offline evaluation
+
+Add `--output` to save a successful `--case` response in a new run directory:
+
+```powershell
+uv run --locked media-rag-bench recommend movies --case movies-v1-003 --output artifacts/movies-v1-003-run1
+```
+
+The directory contains:
+
+- `responses.json`: the validated answer keyed by case ID, ready for `evaluate-movies`.
+- `run.json`: the selected case, case-file hash, instructions, requested and returned
+  model IDs, output-token limit, UTC save time, request latency, and token usage
+  (or `null` when unavailable).
+
+An existing output file or directory is refused before any model call. A new run
+directory is created only after generation succeeds; choose a new path for each
+run. `--output` requires `--case` and cannot be combined with `--dry-run`. Custom
+requests continue to display results without saving. Both saved files remain
+local under the ignored `artifacts/` directory when using the example path.
+
+Evaluate the saved answer against your ingested catalog:
+
+```powershell
+uv run --locked media-rag-bench evaluate-movies --snapshot data/movies/movies-v1.json --cases benchmarks/cases/movies.v1.json --responses artifacts/movies-v1-003-run1/responses.json --method direct --output artifacts/movies-v1-003-run1/evaluation.json
+```
+
+This evaluates the saved case and reports the other 39 cases as missing. Request
+metadata stays in `run.json`; the evaluator reads only `responses.json`. This
+step does not calculate API cost or run the remaining cases automatically.
 
 ## Ingest a movie catalog
 
