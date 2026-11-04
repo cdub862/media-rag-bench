@@ -1,4 +1,4 @@
-"""Root-level dataset commands; no API server or LLM required."""
+"""Root-level dataset, evaluation, and readable recommendation commands."""
 
 import argparse
 from datetime import UTC, datetime
@@ -6,7 +6,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from shutil import get_terminal_size
 import sys
+from textwrap import fill
 
 import httpx
 from dotenv import load_dotenv
@@ -16,6 +18,7 @@ from .datasets.snapshots import load_movie_snapshot, save_movie_snapshot, snapsh
 from .datasets.tmdb import TmdbError, fetch_movies
 from .evaluation.movies import MovieScorer
 from .evaluation.runner import run_evaluation
+from .generation.openai import GenerationError, generate_movies, movie_instructions
 from .schemas import MovieEvaluationCase
 
 
@@ -27,6 +30,65 @@ def _movie_limit(value: str) -> int:
     if not 1 <= limit <= 1000:
         raise argparse.ArgumentTypeError("limit must be between 1 and 1000")
     return limit
+
+
+def _positive_integer(value: str) -> int:
+    try:
+        number = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError("must be a positive integer") from None
+    if number < 1:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return number
+
+
+def _recommend_movies(args: argparse.Namespace) -> None:
+    if (args.prompt is None) == (args.case_id is None):
+        raise ValueError("Provide either a quoted movie request or --case CASE_ID.")
+    if args.case_id is not None:
+        if args.count is not None:
+            raise ValueError("--case uses the case's recommendation count; omit --count.")
+        cases = TypeAdapter(list[MovieEvaluationCase]).validate_json(args.cases.read_bytes())
+        matches = [case for case in cases if case.case_id == args.case_id]
+        if len(matches) != 1:
+            raise ValueError("Case ID must identify exactly one movie case in --cases.")
+        prompt, count = matches[0].prompt, matches[0].recommendation_count
+    else:
+        prompt, count = args.prompt.strip(), args.count or 3
+    if not prompt:
+        raise ValueError("Movie request must not be blank.")
+    if count > 10:
+        raise ValueError("A single recommendation request supports at most 10 movies.")
+    model = (args.model or os.environ.get("OPENAI_MODEL", "")).strip()
+    print("LLM prompt\n")
+    print(f"Instructions:\n{movie_instructions(count)}\n")
+    print(f"User request:\n{prompt}\n", flush=True)
+    if args.dry_run:
+        print("Dry run: no API request sent.")
+        return
+    if not model:
+        raise ValueError("Set OPENAI_MODEL or pass --model with a model that supports Structured Outputs.")
+    key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not key:
+        raise ValueError("Set OPENAI_API_KEY in your shell or local .env file.")
+    print(f"Calling OpenAI: {model} (direct, no retrieval)...", flush=True)
+    with httpx.Client(
+        headers={"Authorization": f"Bearer {key}"}, timeout=60.0
+    ) as client:
+        result = generate_movies(
+            client, prompt=prompt, count=count, model=model, max_output_tokens=args.max_output_tokens
+        )
+    print("\nMovie recommendations\n")
+    width = max(40, min(get_terminal_size(fallback=(100, 24)).columns, 120))
+    for index, movie in enumerate(result.response.recommendations, start=1):
+        year = str(movie.release_year) if movie.release_year is not None else "year unknown"
+        print(fill(f"{index}. {movie.title} ({year})", width=width, subsequent_indent="   "))
+        print(fill(movie.explanation, width=width, initial_indent="   ", subsequent_indent="   "))
+        print()
+    input_tokens = result.input_tokens if result.input_tokens is not None else "unavailable"
+    output_tokens = result.output_tokens if result.output_tokens is not None else "unavailable"
+    print(f"Model: {result.model} | Request latency: {result.latency_seconds:.2f}s")
+    print(f"Tokens: input {input_tokens}, output {output_tokens}")
 
 
 def _ingest_movies(args: argparse.Namespace) -> None:
@@ -107,14 +169,25 @@ def main(argv: list[str] | None = None) -> int:
     evaluate.add_argument("--responses", type=Path, required=True)
     evaluate.add_argument("--method", choices=("direct", "rag"), required=True)
     evaluate.add_argument("--output", type=Path, required=True)
+    recommend = commands.add_parser("recommend", help="Show an LLM prompt and readable recommendations")
+    recommend.add_argument("domain", choices=("movies",), help="Movies first; games and albums follow later")
+    recommend.add_argument("prompt", nargs="?", help="Your quoted movie request")
+    recommend.add_argument("--case", dest="case_id", help="Use a versioned evaluation case instead of a request")
+    recommend.add_argument("--cases", type=Path, default=Path("benchmarks/cases/movies.v1.json"))
+    recommend.add_argument("--count", type=_positive_integer, help="Number of movies, 1-10; default 3 for custom requests")
+    recommend.add_argument("--model", help="OpenAI model ID; defaults to OPENAI_MODEL")
+    recommend.add_argument("--max-output-tokens", type=_positive_integer, default=4096)
+    recommend.add_argument("--dry-run", action="store_true", help="Print the prompt without calling a model")
     args = parser.parse_args(argv)
     try:
         load_dotenv(dotenv_path=Path.cwd() / ".env", override=False, encoding="utf-8-sig")
         if args.command == "ingest-movies":
             _ingest_movies(args)
-        else:
+        elif args.command == "evaluate-movies":
             _evaluate_movies(args)
-    except (TmdbError, OSError, ValueError) as exc:
+        else:
+            _recommend_movies(args)
+    except (TmdbError, GenerationError, OSError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     return 0

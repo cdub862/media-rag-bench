@@ -6,10 +6,11 @@ then albums and video games. The full plan is in
 
 ## Current phase
 
-Phase 1C adds offline evaluation of saved recommendations against validated movie
-snapshots. The earlier slices provide Python contracts and TMDB ingestion. The
-evaluation set still contains three synthetic cases; expanding it to 30–50 real
-requests is a later slice. No model calls or frontend are included in this slice.
+The current changes add 40 movie evaluation requests, a fixed 12-case human-review
+subset, a relevance-rating rubric, and a readable movie recommendation CLI. The
+CLI supports single direct OpenAI requests; a complete measured model benchmark
+remains future work. Earlier slices provide Python contracts, TMDB ingestion,
+and offline evaluation.
 
 ## Run from the repository root
 
@@ -38,8 +39,9 @@ uv's build backend supports this through its
 
 The CLI automatically loads `.env` from the current working directory when the
 file exists. Run commands from the repository root to use your local `.env`.
-Existing shell variables take precedence over `.env`. A missing `.env` is fine
-when using shell variables or offline evaluation.
+Existing shell variables take precedence over `.env`, and `--model` takes
+precedence over `OPENAI_MODEL`. A missing `.env` is fine when using shell
+variables, offline evaluation, or `--dry-run`.
 
 ## Layout
 
@@ -47,6 +49,7 @@ when using shell variables or offline evaluation.
   responses, and movie evaluation cases.
 - `backend/src/media_rag_bench/datasets/`: TMDB ingestion and JSON snapshot storage.
 - `backend/src/media_rag_bench/evaluation/`: shared runner and movie matching/scoring.
+- `backend/src/media_rag_bench/generation/`: direct model requests without retrieval.
 - `backend/tests/`: focused validation tests and synthetic fixtures.
 - `benchmarks/cases/`: versioned evaluation requests, separate from catalog data.
 - `data/` and `artifacts/`: reserved for local catalogs and generated outputs;
@@ -55,6 +58,51 @@ when using shell variables or offline evaluation.
 Python dependencies and their lockfile live at the root. When the frontend phase
 is approved, React + TypeScript will live in `frontend/`, with Bun dependencies,
 a root lockfile, and root scripts to start the API and UI together.
+
+## Try the readable movie CLI
+
+Preview the instructions and user request without credentials or an API call:
+
+```powershell
+uv run --locked media-rag-bench recommend movies "Quiet science fiction from the 1990s" --count 3 --dry-run
+```
+
+For live answers, set `OPENAI_API_KEY` and `OPENAI_MODEL` in your local `.env`.
+Choose a model available to your API project that supports the Responses API and
+[Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
+The CLI uses the existing HTTPX dependency to call the API directly.
+
+```powershell
+uv run --locked media-rag-bench recommend movies "Quiet science fiction from the 1990s" --count 3
+```
+
+Or try one of the 40 evaluation requests:
+
+```powershell
+uv run --locked media-rag-bench recommend movies --case movies-v1-003
+```
+
+Every run first displays the instructions and user request sent to the model.
+Structured output configuration is sent separately alongside that prompt. Live
+answers appear as a numbered list of titles, years, and wrapped explanations,
+followed by the returned model, request latency, and token usage when available.
+
+Custom requests default to three films; use `--count` for 1–10 films and keep any
+count mentioned in your request consistent with that option. A selected case
+provides its own count, so omit `--count` with `--case`. `--cases` selects another
+case file. `--model` overrides `OPENAI_MODEL`. `--max-output-tokens` defaults to
+4096; increase it if a model consumes the budget before completing its answer.
+
+This is a direct request based on the model's general knowledge. It receives no
+catalog records or retrieved evidence, and returned titles/years are not fact
+checked by this command. It sends one request with a 60-second network timeout,
+without automatic retries, and reports refusals, incomplete answers, and invalid
+outputs as errors. Live calls use your OpenAI API account. No API cost estimate
+or benchmark result is inferred from this single response.
+
+Movies are supported first. Game and album commands will follow their domain
+adapters and evaluation sets. Responses here are displayed in the terminal;
+saved full benchmark runs remain a later slice.
 
 ## Ingest a movie catalog
 
@@ -177,10 +225,16 @@ catalog and evidence IDs. Missing citations and out-of-catalog titles remain
 representable so the evaluator can report them. Schema validation checks shape,
 not factual accuracy or recommendation quality.
 
-`benchmarks/cases/movies.sample.json` and the test fixtures use fictional titles
-and original descriptions. They are smoke-test inputs, not a real catalog, the
-planned 30–50 evaluation requests, or measured benchmark results. The
-`human_review` flag selects cases for later human relevance ratings; no ratings
-have been collected.
+The versioned evaluation set is
+[`benchmarks/cases/movies.v1.json`](benchmarks/cases/movies.v1.json). Its 40 requests
+cover genre, year, count, theme, and tone preferences. Twelve cases are selected
+for human review. See the [set notes and rating rubric](benchmarks/README.md) for
+coverage limitations, versioning, and review instructions. Pass this file to
+`evaluate-movies --cases` with saved answers keyed by its case IDs.
+
+`benchmarks/cases/movies.sample.json` and the test fixtures remain synthetic
+smoke-test inputs. They are separate from the 40-case set and contain no measured
+model results. The `human_review` flag selects cases for later relevance ratings;
+no ratings have been collected.
 
 Work proceeds one approved slice at a time, following [AGENTS.md](AGENTS.md).

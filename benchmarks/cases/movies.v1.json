@@ -1,0 +1,569 @@
+[
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-001",
+    "domain": "movies",
+    "prompt": "Recommend 1 action film with a clear central goal and energetic set pieces. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "genres_all": [
+        "Action"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-002",
+    "domain": "movies",
+    "prompt": "Recommend 2 comedy films released from 1980 through 1999, inclusive, with a lighthearted tone. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1980,
+      "release_year_max": 1999,
+      "genres_all": [
+        "Comedy"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-003",
+    "domain": "movies",
+    "prompt": "Recommend 3 drama films released from 1990 through 1999, inclusive, about complicated family relationships. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 1990,
+      "release_year_max": 1999,
+      "genres_all": [
+        "Drama"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-004",
+    "domain": "movies",
+    "prompt": "Recommend 2 science fiction films released from 2000 through 2009, inclusive, about the social consequences of technology. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2009,
+      "genres_all": [
+        "Science Fiction"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-005",
+    "domain": "movies",
+    "prompt": "Recommend 1 mystery film released from 1970 through 1999, inclusive, with an investigation that rewards close attention. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 1970,
+      "release_year_max": 1999,
+      "genres_all": [
+        "Mystery"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-006",
+    "domain": "movies",
+    "prompt": "Recommend 3 animated films released from 2000 through 2020, inclusive, with inventive visual storytelling. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2020,
+      "genres_all": [
+        "Animation"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-007",
+    "domain": "movies",
+    "prompt": "Recommend 2 documentary films released from 2010 through 2020, inclusive, about the natural world. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2010,
+      "release_year_max": 2020,
+      "genres_all": [
+        "Documentary"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-008",
+    "domain": "movies",
+    "prompt": "Recommend 1 western film released before 1970 with a memorable conflict over loyalty. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_max": 1969,
+      "genres_all": [
+        "Western"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-009",
+    "domain": "movies",
+    "prompt": "Recommend 2 romance films released from 2000 through 2019, inclusive, with a bittersweet emotional tone. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2019,
+      "genres_all": [
+        "Romance"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-010",
+    "domain": "movies",
+    "prompt": "Recommend 2 history films released before 2000 that make their historical setting central to the story. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_max": 1999,
+      "genres_all": [
+        "History"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-011",
+    "domain": "movies",
+    "prompt": "Recommend 3 films classified as both Action and Adventure, released from 1990 through 2010, inclusive, built around a journey. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 1990,
+      "release_year_max": 2010,
+      "genres_all": [
+        "Action",
+        "Adventure"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-012",
+    "domain": "movies",
+    "prompt": "Recommend 2 films classified as both Comedy and Romance, released from 1990 through 2009, inclusive, with warm, witty dialogue. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1990,
+      "release_year_max": 2009,
+      "genres_all": [
+        "Comedy",
+        "Romance"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-013",
+    "domain": "movies",
+    "prompt": "Recommend 2 films classified as both Crime and Thriller, released from 2000 through 2015, inclusive, with a tense investigation. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2015,
+      "genres_all": [
+        "Crime",
+        "Thriller"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-014",
+    "domain": "movies",
+    "prompt": "Recommend 2 films classified as both Horror and Mystery, released from 1980 through 2010, inclusive, that build suspense gradually. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1980,
+      "release_year_max": 2010,
+      "genres_all": [
+        "Horror",
+        "Mystery"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-015",
+    "domain": "movies",
+    "prompt": "Recommend 3 films classified as both Animation and Family, released from 1995 through 2020, inclusive, with humor that can appeal to adults as well as children. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 1995,
+      "release_year_max": 2020,
+      "genres_all": [
+        "Animation",
+        "Family"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-016",
+    "domain": "movies",
+    "prompt": "Recommend 1 film classified as both Drama and Music, released from 2000 through 2020, inclusive, about the personal demands of making music. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2020,
+      "genres_all": [
+        "Drama",
+        "Music"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-017",
+    "domain": "movies",
+    "prompt": "Recommend 2 films classified as both History and War, released from 1960 through 1999, inclusive, that explore the human cost of conflict. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1960,
+      "release_year_max": 1999,
+      "genres_all": [
+        "History",
+        "War"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-018",
+    "domain": "movies",
+    "prompt": "Recommend 2 films classified as both Fantasy and Adventure, released from 1980 through 2010, inclusive, with an imaginative unfamiliar world. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1980,
+      "release_year_max": 2010,
+      "genres_all": [
+        "Fantasy",
+        "Adventure"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-019",
+    "domain": "movies",
+    "prompt": "Recommend 3 films classified as both Crime and Drama, released from 1970 through 2009, inclusive, about divided loyalties. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 1970,
+      "release_year_max": 2009,
+      "genres_all": [
+        "Crime",
+        "Drama"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-020",
+    "domain": "movies",
+    "prompt": "Recommend 2 films classified as both Action and Science Fiction, released from 1990 through 2020, inclusive, where invented technology shapes the action. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1990,
+      "release_year_max": 2020,
+      "genres_all": [
+        "Action",
+        "Science Fiction"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-021",
+    "domain": "movies",
+    "prompt": "Recommend 3 films about rebuilding a life after a major setback, with a hopeful rather than cynical tone. Any genre or release year is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {},
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-022",
+    "domain": "movies",
+    "prompt": "Recommend 2 films released before 1990 about a friendship between people from different backgrounds. Any genre is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_max": 1989
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-023",
+    "domain": "movies",
+    "prompt": "Recommend 3 films released from 2000 through 2020, inclusive, about leaders facing morally difficult choices. Any genre is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2020
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-024",
+    "domain": "movies",
+    "prompt": "Recommend 2 films released from 1990 through 2019, inclusive, that use repeating events or time loops in a playful way. Any genre is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1990,
+      "release_year_max": 2019
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-025",
+    "domain": "movies",
+    "prompt": "Recommend 1 film released from 2000 through 2020, inclusive, with a quiet, reflective portrayal of loneliness in a city. Any genre is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2020
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-026",
+    "domain": "movies",
+    "prompt": "Recommend 3 films in which a seemingly small decision leads to far-reaching consequences. Any genre or release year is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {},
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-027",
+    "domain": "movies",
+    "prompt": "Recommend 2 films released before 2000 about looking back on earlier life choices, with a bittersweet mood. Any genre is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_max": 1999
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-028",
+    "domain": "movies",
+    "prompt": "Recommend 2 films released from 2010 through 2020, inclusive, about resilience during an everyday personal crisis, with a grounded tone. Any genre is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2010,
+      "release_year_max": 2020
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-029",
+    "domain": "movies",
+    "prompt": "Recommend 1 film released from 1950 through 1989, inclusive, that creates tension while keeping most of the story in a small number of locations. Any genre is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 1950,
+      "release_year_max": 1989
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-030",
+    "domain": "movies",
+    "prompt": "Recommend 3 films that create a strong sense of wonder through atmosphere and discovery. Any genre or release year is acceptable. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {},
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-031",
+    "domain": "movies",
+    "prompt": "Recommend 2 thriller films released in 2010 that sustain tension through uncertainty about whom to trust. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2010,
+      "release_year_max": 2010,
+      "genres_all": [
+        "Thriller"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-032",
+    "domain": "movies",
+    "prompt": "Recommend 1 science fiction film released in 1999 with an imaginative central premise. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 1999,
+      "release_year_max": 1999,
+      "genres_all": [
+        "Science Fiction"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-033",
+    "domain": "movies",
+    "prompt": "Recommend 2 drama films released before 1960 with memorable, complex central characters. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_max": 1959,
+      "genres_all": [
+        "Drama"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-034",
+    "domain": "movies",
+    "prompt": "Recommend 3 action films released from 2020 through 2025, inclusive, with clearly staged action sequences. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 2020,
+      "release_year_max": 2025,
+      "genres_all": [
+        "Action"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-035",
+    "domain": "movies",
+    "prompt": "Recommend 1 comedy film released in 1979 with an offbeat sense of humor. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 1979,
+      "release_year_max": 1979,
+      "genres_all": [
+        "Comedy"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-036",
+    "domain": "movies",
+    "prompt": "Recommend 2 animated films released from 2015 through 2025, inclusive, with distinctive visual styles. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2015,
+      "release_year_max": 2025,
+      "genres_all": [
+        "Animation"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-037",
+    "domain": "movies",
+    "prompt": "Recommend 3 films classified as both Adventure and Family, released from 1990 through 2019, inclusive, where cooperation matters to the journey. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 3,
+    "constraints": {
+      "release_year_min": 1990,
+      "release_year_max": 2019,
+      "genres_all": [
+        "Adventure",
+        "Family"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-038",
+    "domain": "movies",
+    "prompt": "Recommend 2 mystery films released from 1960 through 1979, inclusive, with clues that invite the viewer to form their own theory. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 1960,
+      "release_year_max": 1979,
+      "genres_all": [
+        "Mystery"
+      ]
+    },
+    "human_review": false
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-039",
+    "domain": "movies",
+    "prompt": "Recommend 1 film classified as both Documentary and Music, released from 2000 through 2025, inclusive, that offers insight into a creative process. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 1,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2025,
+      "genres_all": [
+        "Documentary",
+        "Music"
+      ]
+    },
+    "human_review": true
+  },
+  {
+    "schema_version": 1,
+    "case_id": "movies-v1-040",
+    "domain": "movies",
+    "prompt": "Recommend 2 films classified as both Drama and Romance, released from 2000 through 2025, inclusive, that focus on intimate emotional choices. Give a brief, spoiler-free reason for each recommendation.",
+    "recommendation_count": 2,
+    "constraints": {
+      "release_year_min": 2000,
+      "release_year_max": 2025,
+      "genres_all": [
+        "Drama",
+        "Romance"
+      ]
+    },
+    "human_review": false
+  }
+]
