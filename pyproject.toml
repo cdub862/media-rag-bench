@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "A reproducible direct-LLM versus RAG recommendation benchmark."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["httpx>=0.28,<1", "pydantic>=2.12,<3"]
+dependencies = [
+    "httpx>=0.28,<1",
+    "pydantic>=2.12,<3",
+    "python-dotenv>=1.2,<2",
+]
 
 [project.scripts]
 media-rag-bench = "media_rag_bench.cli:main"

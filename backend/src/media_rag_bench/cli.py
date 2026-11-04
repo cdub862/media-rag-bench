@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 
 import httpx
+from dotenv import load_dotenv
 from pydantic import TypeAdapter
 
 from .datasets.snapshots import load_movie_snapshot, save_movie_snapshot, snapshot_path
@@ -34,7 +35,7 @@ def _ingest_movies(args: argparse.Namespace) -> None:
         raise FileExistsError(f"Snapshot already exists: {destination}. Choose a new version.")
     token = os.environ.get("TMDB_READ_ACCESS_TOKEN", "").strip()
     if not token:
-        raise ValueError("Set TMDB_READ_ACCESS_TOKEN or use uv run --env-file .env.")
+        raise ValueError("Set TMDB_READ_ACCESS_TOKEN in your shell or local .env file.")
     print(f"Fetching {args.limit} movies from TMDB...", flush=True)
     with httpx.Client(
         headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
@@ -108,6 +109,7 @@ def main(argv: list[str] | None = None) -> int:
     evaluate.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
+        load_dotenv(dotenv_path=Path.cwd() / ".env", override=False, encoding="utf-8-sig")
         if args.command == "ingest-movies":
             _ingest_movies(args)
         else:

@@ -36,6 +36,11 @@ changes, manual virtual environment activation, or `PYTHONPATH` changes are need
 uv's build backend supports this through its
 [`module-root` setting](https://docs.astral.sh/uv/configuration/build-backend/).
 
+The CLI automatically loads `.env` from the current working directory when the
+file exists. Run commands from the repository root to use your local `.env`.
+Existing shell variables take precedence over `.env`. A missing `.env` is fine
+when using shell variables or offline evaluation.
+
 ## Layout
 
 - `backend/src/media_rag_bench/schemas/`: movie records, provenance, recommendation
@@ -55,17 +60,17 @@ a root lockfile, and root scripts to start the API and UI together.
 
 Get an **API Read Access Token** from your [TMDB API settings](https://www.themoviedb.org/settings/api).
 TMDB accepts it as a Bearer token; see [application authentication](https://developer.themoviedb.org/docs/authentication-application).
-Copy `.env.example` to `.env` and set `TMDB_READ_ACCESS_TOKEN` locally. The command
-does not load `.env` by itself; pass it to uv explicitly:
+Copy `.env.example` to `.env` and set `TMDB_READ_ACCESS_TOKEN` locally. The CLI
+loads it automatically:
 
 ```powershell
-uv run --locked --env-file .env media-rag-bench ingest-movies --dataset-version movies-v1 --limit 500
+uv run --locked media-rag-bench ingest-movies --dataset-version movies-v1 --limit 500
 ```
 
 For an initial live smoke check, use a separate version with `--limit 5`. The limit
 must be between 1 and 1,000; it defaults to 500. `--language` defaults to `en-US`;
 it selects translated metadata, not movies' original language. You can also set
-the token in your shell environment and omit `--env-file .env`.
+the token in your shell environment instead of `.env`.
 
 The command uses [movie discovery](https://developer.themoviedb.org/reference/discover-movie)
 sorted by descending popularity, excludes adult and video entries, deduplicates
