@@ -13,10 +13,18 @@
 
 1. Propose one small phase with a concrete scope and wait for the user to confirm it before implementation.
 2. Implement only that phase and perform the minimal relevant verification described below.
-3. Report the completed changes and verification, then stop and wait for the user's review approval. Do not commit yet or start the next phase.
+3. Report the completed changes using the phase report requirements below, then stop and wait for the user's review approval. Do not commit yet or start the next phase.
 4. When the user says "approve" in response to the completed phase, commit the reviewed changes for that phase. Include only the phase's changes; do not include unrelated user work. This approval authorizes the commit, not implementation of the next phase.
 5. Report the commit and propose the next phase's concrete scope, asking the user to confirm it. Wait for that confirmation before starting the next phase.
 6. Repeat this workflow for each phase. Keep approval of completed work separate from confirmation to begin new work.
+
+## Phase implementation reports
+
+- After every phase implementation, explain in plain language what was done and how the resulting behavior works.
+- Include clickable references to the relevant changed files, with line numbers for the main implementation points where useful.
+- Explain why each main change was needed and how it contributes to the approved phase and project goal. Connect the explanation to the referenced files rather than listing filenames alone.
+- Report the verification performed, its results, and what remains for manual testing, including any material limitations.
+- State that the phase is ready for review and whether it has been committed. Stop for review approval as required by the workflow above.
 
 ## Commit message conventions
 
