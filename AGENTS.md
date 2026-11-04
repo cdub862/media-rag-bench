@@ -15,7 +15,7 @@
 2. Implement only that phase and perform the minimal relevant verification described below.
 3. Report the completed changes using the phase report requirements below, then stop and wait for the user's review approval. Do not commit yet or start the next phase.
 4. When the user says "approve" in response to the completed phase, commit the reviewed changes for that phase. Include only the phase's changes; do not include unrelated user work. This approval authorizes the commit, not implementation of the next phase.
-5. Report the commit and propose the next phase's concrete scope, asking the user to confirm it. Wait for that confirmation before starting the next phase.
+5. Report the commit and automatically describe the next phase's concrete scope in the same response. Do not require separate confirmation or ask permission to show or discuss the next phase. Presenting the scope does not authorize implementation; begin only when the user explicitly approves that scope.
 6. Repeat this workflow for each phase. Keep approval of completed work separate from confirmation to begin new work.
 
 ## Phase implementation reports
