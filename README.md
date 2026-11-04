@@ -8,8 +8,9 @@ then albums and video games. The full plan is in
 
 The current changes add 40 movie evaluation requests, a fixed 12-case human-review
 subset, a relevance-rating rubric, and a readable movie recommendation CLI. The
-CLI supports single direct OpenAI requests and saving individual case runs for
-offline evaluation; a complete measured model benchmark remains future work.
+CLI supports single direct OpenAI requests and sequential runs of selected cases,
+with saved responses and metadata for offline evaluation. A complete measured
+model benchmark remains future work.
 Earlier slices provide Python contracts, TMDB ingestion, and offline evaluation.
 
 ## Run from the repository root
@@ -101,7 +102,7 @@ outputs as errors. Live calls use your OpenAI API account. No API cost estimate
 or benchmark result is inferred from this single response.
 
 Movies are supported first. Game and album commands will follow their domain
-adapters and evaluation sets. Full benchmark runs remain a later slice.
+adapters and evaluation sets.
 
 ### Save one case for offline evaluation
 
@@ -133,6 +134,56 @@ uv run --locked media-rag-bench evaluate-movies --snapshot data/movies/movies-v1
 This evaluates the saved case and reports the other 39 cases as missing. Request
 metadata stays in `run.json`; the evaluator reads only `responses.json`. This
 step does not calculate API cost or run the remaining cases automatically.
+
+## Run several movie cases
+
+Select each case explicitly with a repeated `--case` option. Requests run
+sequentially in the order given, using the same requested model and output-token
+limit:
+
+```powershell
+uv run --locked media-rag-bench benchmark movies --case movies-v1-001 --case movies-v1-003 --output artifacts/openai-direct-run1
+```
+
+Use `--cases` for another case file, `--model` to override `OPENAI_MODEL`, and
+`--max-output-tokens` to change the default 4096-token limit per request. At least
+one `--case` is required. Duplicate selections, unknown IDs, duplicate IDs in
+the case file, and cases requesting more than 10 films are refused before model
+calls. An existing output path is never reused.
+
+The command creates a new run directory before the first request. After each
+case it saves:
+
+- `responses.json`: validated answers or `{"error": "..."}` entries keyed by
+  case ID, ready for the offline evaluator.
+- `run.json`: the case-file hash, selected cases in order, requested model and
+  output-token limit, run status, success/error counts, and per-case instructions,
+  returned model, latency, and token usage.
+
+Each JSON file is replaced atomically as progress is saved. Previously saved
+responses survive a later request failure. Request errors are recorded and the
+remaining cases continue, without retries. Refusals, incomplete answers, and
+invalid model outputs are also recorded as errors. Failed requests retain elapsed
+time; returned model and token usage remain `null` because the generation client
+does not expose those details for failures. Missing usage on a successful answer
+also remains `null`. API cost is not calculated.
+
+Exit status is 0 when all selected cases succeed, 1 when any fail, and 130 when
+interrupted with Ctrl+C. A handled interruption marks the run `interrupted` and
+preserves completed results; unattempted cases have no response entry. An abrupt
+process termination can leave status `running`, and the two JSON files may show
+different progress if termination happens between their writes. Use a new output
+directory to rerun cases.
+
+Evaluate the collected answers against your catalog:
+
+```powershell
+uv run --locked media-rag-bench evaluate-movies --snapshot data/movies/movies-v1.json --cases benchmarks/cases/movies.v1.json --responses artifacts/openai-direct-run1/responses.json --method direct --output artifacts/openai-direct-run1/evaluation.json
+```
+
+The evaluator reports cases from the supplied case file that were not run as
+missing. The generation command performs model calls and saves results; scoring
+remains a separate offline step.
 
 ## Ingest a movie catalog
 

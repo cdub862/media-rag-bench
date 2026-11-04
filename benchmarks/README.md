@@ -105,5 +105,19 @@ selected case supplies its recommendation count. Add
 its model, prompt, latency, and usage metadata as `run.json` in a new directory.
 Pass `responses.json` to `evaluate-movies --responses`; the remaining cases are
 reported as missing. Existing output paths are refused before a model call, and
-`--output` cannot be combined with `--dry-run`. Full benchmark runs remain future
-work. Game and album support will follow their dataset adapters.
+`--output` cannot be combined with `--dry-run`. Game and album support will follow
+their dataset adapters.
+
+To collect multiple cases sequentially with one model and output-token limit:
+
+```powershell
+uv run --locked media-rag-bench benchmark movies --case movies-v1-001 --case movies-v1-003 --output artifacts/openai-direct-run1
+```
+
+Repeat `--case` for every case to run, in the desired order. The command requires
+a new output directory and saves `responses.json` and `run.json` after each case.
+Failures are retained as error entries and later cases continue. The exit status
+is nonzero if any case fails. Use `responses.json` with the offline evaluator;
+cases in the evaluation set without a response remain missing. See the root
+[README](../README.md#run-several-movie-cases) for metadata, interruption behavior,
+and evaluation commands. No live benchmark results are included in the repository.

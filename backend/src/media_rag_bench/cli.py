@@ -19,6 +19,7 @@ from .datasets.tmdb import TmdbError, fetch_movies
 from .evaluation.movies import MovieScorer
 from .evaluation.runner import run_evaluation
 from .generation.openai import GenerationError, generate_movies, movie_instructions
+from .generation.runner import run_movie_benchmark
 from .schemas import MovieEvaluationCase
 
 
@@ -123,6 +124,47 @@ def _recommend_movies(args: argparse.Namespace) -> None:
     print(f"Tokens: input {input_tokens}, output {output_tokens}")
 
 
+def _benchmark_movies(args: argparse.Namespace) -> int:
+    case_bytes = args.cases.read_bytes()
+    cases = TypeAdapter(list[MovieEvaluationCase]).validate_json(case_bytes)
+    by_id = {case.case_id: case for case in cases}
+    if not cases or len(by_id) != len(cases):
+        raise ValueError("Case file must be nonempty and have unique case IDs.")
+    if len(set(args.case_ids)) != len(args.case_ids):
+        raise ValueError("Select each --case at most once.")
+    if set(args.case_ids) - by_id.keys():
+        raise ValueError("Every --case must identify a movie case in --cases.")
+    selected = [by_id[case_id] for case_id in args.case_ids]
+    if args.output.exists() or args.output.is_symlink():
+        raise FileExistsError(f"Run directory already exists: {args.output}. Choose a new output path.")
+    model = (args.model or os.environ.get("OPENAI_MODEL", "")).strip()
+    if not model:
+        raise ValueError("Set OPENAI_MODEL or pass --model with a model that supports Structured Outputs.")
+    key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not key:
+        raise ValueError("Set OPENAI_API_KEY in your shell or local .env file.")
+    print(f"Running {len(selected)} movie cases with {model} (direct, no retrieval)...", flush=True)
+    with httpx.Client(headers={"Authorization": f"Bearer {key}"}, timeout=60.0) as client:
+        def generate(case: MovieEvaluationCase):
+            print(f"Case {case.case_id}...", flush=True)
+            return generate_movies(
+                client, prompt=case.prompt, count=case.recommendation_count,
+                model=model, max_output_tokens=args.max_output_tokens,
+            )
+
+        try:
+            run = run_movie_benchmark(
+                selected, generate=generate, output_dir=args.output,
+                cases_file={"path": str(args.cases), "sha256": hashlib.sha256(case_bytes).hexdigest()},
+                model=model, max_output_tokens=args.max_output_tokens,
+            )
+        except KeyboardInterrupt:
+            print(f"Benchmark interrupted; completed results remain in {args.output}.", file=sys.stderr)
+            return 130
+    print(f"Completed: {run['success_count']} succeeded, {run['error_count']} failed. Saved to {args.output}")
+    return 1 if run["error_count"] else 0
+
+
 def _ingest_movies(args: argparse.Namespace) -> None:
     destination = snapshot_path(args.output_dir, args.dataset_version)
     if destination.exists():
@@ -211,6 +253,13 @@ def main(argv: list[str] | None = None) -> int:
     recommend.add_argument("--max-output-tokens", type=_positive_integer, default=4096)
     recommend.add_argument("--dry-run", action="store_true", help="Print the prompt without calling a model")
     recommend.add_argument("--output", type=Path, help="Save a --case response and metadata in a new run directory")
+    benchmark = commands.add_parser("benchmark", help="Run selected movie cases and save each result")
+    benchmark.add_argument("domain", choices=("movies",))
+    benchmark.add_argument("--case", dest="case_ids", action="append", required=True, help="Case ID to run; repeat to select more cases in order")
+    benchmark.add_argument("--cases", type=Path, default=Path("benchmarks/cases/movies.v1.json"))
+    benchmark.add_argument("--output", type=Path, required=True, help="New run directory for responses and metadata")
+    benchmark.add_argument("--model", help="OpenAI model ID; defaults to OPENAI_MODEL")
+    benchmark.add_argument("--max-output-tokens", type=_positive_integer, default=4096)
     args = parser.parse_args(argv)
     try:
         load_dotenv(dotenv_path=Path.cwd() / ".env", override=False, encoding="utf-8-sig")
@@ -218,6 +267,8 @@ def main(argv: list[str] | None = None) -> int:
             _ingest_movies(args)
         elif args.command == "evaluate-movies":
             _evaluate_movies(args)
+        elif args.command == "benchmark":
+            return _benchmark_movies(args)
         else:
             _recommend_movies(args)
     except (TmdbError, GenerationError, OSError, ValueError) as exc:
